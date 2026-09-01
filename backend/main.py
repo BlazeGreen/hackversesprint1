@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import time
@@ -7,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from agents import run_pipeline, stream_pipeline
+from live_market import fetch_live_quote
 from log import log_session, read_recent_logs
 
 app = FastAPI(title="Retail Financial Intelligence - Multi-Agent Backend")
@@ -32,23 +34,45 @@ def list_tickers():
     return {"tickers": list(market.keys())}
 
 
+@app.get("/quotes")
+async def quotes():
+    """Live snapshot for all covered tickers -- pure market data, no LLM calls.
+    Powers the ticker tape without touching Gemini quota."""
+    market = _load_json("market_feed.json")
+    result = {}
+    for ticker, fallback in market.items():
+        result[ticker] = await asyncio.to_thread(fetch_live_quote, ticker, fallback)
+    return result
+
+
 @app.get("/profiles")
 def list_profiles():
     return _load_json("user_profiles.json")
 
 
-@app.get("/analyze/{ticker}")
-async def analyze(ticker: str, profile_id: str = "conservative_investor"):
-    market = _load_json("market_feed.json")
+def _resolve_profile(profile_id: str | None, profile_json: str | None) -> dict:
+    """Either a saved preset (profile_id) or a user-built profile from the
+    onboarding form, passed as a URL-encoded JSON blob (profile_json)."""
+    if profile_json:
+        try:
+            return json.loads(profile_json)
+        except json.JSONDecodeError:
+            raise HTTPException(400, "profile_json is not valid JSON")
     profiles = _load_json("user_profiles.json")
+    if profile_id not in profiles:
+        raise HTTPException(404, f"No such profile {profile_id}")
+    return profiles[profile_id]
+
+
+@app.get("/analyze/{ticker}")
+async def analyze(ticker: str, profile_id: str = "conservative_investor", profile_json: str = None):
+    market = _load_json("market_feed.json")
 
     if ticker not in market:
         raise HTTPException(404, f"No market data for {ticker}")
-    if profile_id not in profiles:
-        raise HTTPException(404, f"No such profile {profile_id}")
+    user_profile = _resolve_profile(profile_id, profile_json)
 
-    market_data = market[ticker]
-    user_profile = profiles[profile_id]
+    market_data = await asyncio.to_thread(fetch_live_quote, ticker, market[ticker])
 
     start = time.time()
     result = await run_pipeline(ticker, market_data, user_profile)
@@ -67,22 +91,19 @@ async def analyze(ticker: str, profile_id: str = "conservative_investor"):
 
 
 @app.get("/analyze_stream/{ticker}")
-async def analyze_stream(ticker: str, profile_id: str = "conservative_investor"):
+async def analyze_stream(ticker: str, profile_id: str = "conservative_investor", profile_json: str = None):
     """
     Server-Sent Events endpoint. Streams one JSON event per line as each
     agent finishes, instead of making the client wait for the full pipeline.
     Frontend consumes this with EventSource.
     """
     market = _load_json("market_feed.json")
-    profiles = _load_json("user_profiles.json")
 
     if ticker not in market:
         raise HTTPException(404, f"No market data for {ticker}")
-    if profile_id not in profiles:
-        raise HTTPException(404, f"No such profile {profile_id}")
+    user_profile = _resolve_profile(profile_id, profile_json)
 
-    market_data = market[ticker]
-    user_profile = profiles[profile_id]
+    market_data = await asyncio.to_thread(fetch_live_quote, ticker, market[ticker])
 
     async def event_generator():
         start = time.time()

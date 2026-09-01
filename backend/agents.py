@@ -1,30 +1,13 @@
-"""
-Multi-agent core. 3 specialist agents run in parallel (asyncio.gather),
-each returns a strict JSON contract. A 4th synthesizer agent combines
-their outputs + the user's risk profile into a final recommendation.
-
-Degraded-data handling: if a specialist agent errors out or a data field
-is missing, we don't crash the pipeline - we mark that agent's output as
-DEGRADED and the synthesizer is told to flag it explicitly rather than
-silently ignore it.
-"""
 import os
 import json
 import time
 import asyncio
+import traceback
 import httpx
 from retriever import retrieve
 
-# ── LOCAL MODEL (Ollama) ────────────────────────────────────────────────
-# Ollama runs a local server at localhost:11434 once the app is open.
-# No API key, no internet required after the model is pulled.
-OLLAMA_URL = "http://localhost:11434/api/chat"
-MODEL = "llama3.1:8b"
-
-# ── CLOUD FALLBACK (uncomment if local model misbehaves before judging) ──
-# from anthropic import AsyncAnthropic
-# client = AsyncAnthropic()  # reads ANTHROPIC_API_KEY from env
-# CLOUD_MODEL = "claude-sonnet-4-5"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent"
 
 AGENT_JSON_INSTRUCTIONS = (
     "Respond with ONLY a JSON object, no markdown fences, no preamble. "
@@ -32,30 +15,36 @@ AGENT_JSON_INSTRUCTIONS = (
     '"reasoning": "<2-3 sentence explanation>", "sources": ["<short source label>"]}'
 )
 
-_http_client = httpx.AsyncClient(timeout=60)
+_http_client = httpx.AsyncClient(
+    timeout=30,
+    transport=httpx.AsyncHTTPTransport(local_address="0.0.0.0"),
+)
 
 
-async def _call_agent(system_prompt: str, user_prompt: str, agent_name: str, timeout=30):
+async def _call_agent(system_prompt: str, user_prompt: str, agent_name: str, timeout=45):
     start = time.time()
     try:
         resp = await asyncio.wait_for(
             _http_client.post(
-                OLLAMA_URL,
+                GEMINI_URL,
+                params={"key": GEMINI_API_KEY},
                 json={
-                    "model": MODEL,
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt},
-                    ],
-                    "stream": False,
-                    "format": "json",  # forces Ollama to only emit valid JSON
-                    "options": {"temperature": 0.3},
+                    "contents": [{"parts": [{"text": user_prompt}]}],
+                    "systemInstruction": {"parts": [{"text": system_prompt}]},
+                    "generationConfig": {
+                        "temperature": 0.3,
+                        "responseMimeType": "application/json",
+                        # Gemini 3.x's extended "thinking" adds real latency for
+                        # not much benefit on these short classification tasks;
+                        # "low" keeps calls fast enough to fit the timeout.
+                        "thinkingConfig": {"thinkingLevel": "low"},
+                    },
                 },
             ),
             timeout=timeout,
         )
         resp.raise_for_status()
-        raw = resp.json()["message"]["content"].strip()
+        raw = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
         raw = raw.replace("```json", "").replace("```", "").strip()
         data = json.loads(raw)
         data["agent"] = agent_name
@@ -64,6 +53,8 @@ async def _call_agent(system_prompt: str, user_prompt: str, agent_name: str, tim
         return data
     except Exception as e:
         # Degraded-data handling: never let a failure kill the pipeline
+        body = getattr(getattr(e, "response", None), "text", None)
+        print(f"[{agent_name}] FULL ERROR:\n{traceback.format_exc()}\nresponse body: {body}")
         return {
             "agent": agent_name,
             "signal": "UNKNOWN",
@@ -73,30 +64,6 @@ async def _call_agent(system_prompt: str, user_prompt: str, agent_name: str, tim
             "latency_ms": int((time.time() - start) * 1000),
             "degraded": True,
         }
-
-
-# ── CLOUD FALLBACK VERSION (swap _call_agent's body for this if needed) ──
-# async def _call_agent_cloud(system_prompt, user_prompt, agent_name, timeout=20):
-#     start = time.time()
-#     try:
-#         resp = await asyncio.wait_for(
-#             client.messages.create(
-#                 model=CLOUD_MODEL, max_tokens=400,
-#                 system=system_prompt,
-#                 messages=[{"role": "user", "content": user_prompt}],
-#             ),
-#             timeout=timeout,
-#         )
-#         raw = resp.content[0].text.strip().replace("```json", "").replace("```", "").strip()
-#         data = json.loads(raw)
-#         data["agent"] = agent_name
-#         data["latency_ms"] = int((time.time() - start) * 1000)
-#         data["degraded"] = False
-#         return data
-#     except Exception as e:
-#         return {"agent": agent_name, "signal": "UNKNOWN", "confidence": 0,
-#                 "reasoning": f"Agent failed: {str(e)[:120]}", "sources": [],
-#                 "latency_ms": int((time.time() - start) * 1000), "degraded": True}
 
 
 async def momentum_agent(ticker: str, market_data: dict):

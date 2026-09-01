@@ -3,13 +3,41 @@
     "name": "Conservative Investor",
     "risk_tolerance": "low",
     "investment_horizon": "long-term (5+ years)",
+    "primary_goal": "Capital preservation and steady retirement corpus growth",
+    "monthly_investment_capacity_inr": 25000,
+    "max_drawdown_tolerance_pct": 10,
+    "sector_preferences": {
+      "prefer": ["Banking & Financials", "Large-cap IT"],
+      "avoid": ["Quick Commerce / Consumer Internet", "Small & Mid Cap"]
+    },
     "current_holdings": ["HDFCBANK", "TCS"],
     "notes": "Prioritizes capital preservation. Avoids high-volatility momentum plays. Prefers dividend-paying large caps."
+  },
+  "balanced_investor": {
+    "name": "Balanced Investor",
+    "risk_tolerance": "medium",
+    "investment_horizon": "medium-term (1-3 years)",
+    "primary_goal": "Grow wealth steadily while limiting downside during corrections",
+    "monthly_investment_capacity_inr": 45000,
+    "max_drawdown_tolerance_pct": 18,
+    "sector_preferences": {
+      "prefer": ["Banking & Financials", "Large-cap IT"],
+      "avoid": []
+    },
+    "current_holdings": ["TCS", "HDFCBANK", "ZOMATO"],
+    "notes": "Diversifies across large caps and select growth names. Rebalances quarterly. Willing to accept moderate drawdowns for above-FD returns."
   },
   "aggressive_investor": {
     "name": "Aggressive Investor",
     "risk_tolerance": "high",
     "investment_horizon": "short-term (weeks to months)",
+    "primary_goal": "Maximize short-term trading gains through momentum swings",
+    "monthly_investment_capacity_inr": 75000,
+    "max_drawdown_tolerance_pct": 30,
+    "sector_preferences": {
+      "prefer": ["Quick Commerce / Consumer Internet", "Small & Mid Cap"],
+      "avoid": []
+    },
     "current_holdings": ["ZOMATO"],
     "notes": "Comfortable with high volatility for higher returns. Actively trades momentum and mid/small-cap swings. History of holding through 15%+ drawdowns."
   }

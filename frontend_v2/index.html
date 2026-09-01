@@ -8,17 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #0D0F12;
-    --panel: #15181D;
+    --ink: #0A0C0F;
+    --panel: #14171C;
     --panel-raised: #1B1F26;
-    --line: #2A2F38;
+    --line: #262B33;
     --amber: #E8A33D;
     --amber-dim: #8A6A38;
+    --cyan: #5FC9D6;
+    --cyan-dim: #2E5C61;
     --bullish: #4FA88F;
     --bearish: #C7604C;
     --neutral: #8A93A3;
     --text: #EDEBE4;
-    --text-dim: #8A8F99;
+    --text-dim: #868C97;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -28,7 +30,47 @@
     font-family: 'IBM Plex Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; }
+  body {
+    background-image:
+      linear-gradient(rgba(232,163,61,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,163,61,0.035) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+  ::selection { background: var(--amber); color: #14110A; }
+
+  /* ── Bracket-frame utility: HUD-style corner marks ─────────── */
+  .bracket { position: relative; }
+  .bracket::before, .bracket::after {
+    content: ""; position: absolute; width: 9px; height: 9px;
+    border: 1px solid var(--amber-dim); pointer-events: none;
+  }
+  .bracket::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .bracket::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* ── Ticker tape ────────────────────────────────────────────── */
+  .tape {
+    background: #0D1013;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+    white-space: nowrap;
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
+  .tape-track {
+    display: inline-flex;
+    gap: 40px;
+    padding-left: 100%;
+    animation: tape-scroll 26s linear infinite;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+  }
+  @keyframes tape-scroll { to { transform: translateX(-100%); } }
+  .tape-item .t-name { color: var(--text-dim); margin-right: 6px; }
+  .tape-item .t-up { color: var(--bullish); }
+  .tape-item .t-down { color: var(--bearish); }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 24px 80px; }
 
   /* ── Header ─────────────────────────────────────────────── */
   header {
@@ -41,7 +83,7 @@
   }
   .brand {
     font-family: 'Newsreader', serif;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 500;
     letter-spacing: 0.2px;
     color: var(--text);
@@ -53,8 +95,149 @@
     color: var(--text-dim);
     letter-spacing: 0.4px;
   }
+  .header-right { text-align: right; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .edit-profile-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--cyan);
+    cursor: pointer;
+    letter-spacing: 0.4px;
+    background: none; border: none; padding: 0;
+  }
+  .edit-profile-link:hover { text-decoration: underline; }
 
-  /* ── Command bar (hero) ─────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════
+     INTAKE — the "who are you" gate
+     ══════════════════════════════════════════════════════════ */
+  .intake-shell {
+    min-height: calc(100vh - 30px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .intake-card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 40px 44px 36px;
+  }
+  .intake-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 1.2px;
+    margin-bottom: 10px;
+  }
+  .intake-title {
+    font-family: 'Newsreader', serif;
+    font-size: 32px;
+    font-weight: 500;
+    margin: 0 0 8px;
+  }
+  .intake-desc {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 50ch;
+  }
+  .field { margin-bottom: 24px; }
+  .field-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .field-label .num { color: var(--amber-dim); }
+  .text-input {
+    width: 100%;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  .text-input:focus, textarea:focus { outline: 1px solid var(--amber); }
+  .text-input.money { font-family: 'IBM Plex Mono', monospace; }
+
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 9px 16px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .pill:hover { border-color: var(--amber-dim); color: var(--text); }
+  .pill.active { border-color: var(--amber); color: var(--amber); background: rgba(232,163,61,0.08); }
+  .pill small { display: block; color: var(--text-dim); font-family: 'IBM Plex Sans', sans-serif; font-size: 10.5px; margin-top: 2px; font-weight: 400; }
+  .pill.active small { color: var(--amber-dim); }
+
+  select.text-input { font-family: 'IBM Plex Mono', monospace; appearance: none; cursor: pointer; }
+
+  .slider-row { display: flex; align-items: center; gap: 14px; }
+  input[type="range"] {
+    flex: 1; -webkit-appearance: none; height: 3px; background: var(--line); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--amber); cursor: pointer; border: 2px solid #14110A;
+  }
+  .slider-readout {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--amber);
+    min-width: 42px;
+    text-align: right;
+  }
+
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 7px 14px;
+    cursor: pointer;
+  }
+  .chip.active { border-color: var(--cyan); color: var(--cyan); background: rgba(95,201,214,0.08); }
+
+  textarea.text-input { resize: vertical; min-height: 56px; font-size: 13px; }
+
+  .enter-btn {
+    width: 100%;
+    background: var(--amber);
+    color: #14110A;
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 14px 18px;
+    cursor: pointer;
+    letter-spacing: 0.8px;
+    margin-top: 8px;
+  }
+  .enter-btn:hover { background: #f0b453; }
+
+  /* ══════════════════════════════════════════════════════════
+     DASHBOARD
+     ══════════════════════════════════════════════════════════ */
+  .dashboard { display: none; }
+  .dashboard.visible { display: block; }
+  .intake-shell.hidden { display: none; }
+
+  /* ── Command bar ─────────────────────────────────── */
   .console {
     background: var(--panel);
     border: 1px solid var(--line);
@@ -67,6 +250,7 @@
     gap: 14px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 15px;
+    flex-wrap: wrap;
   }
   .prompt-glyph { color: var(--amber); }
   select {
@@ -123,6 +307,14 @@
     padding: 20px;
     min-height: 190px;
     transition: box-shadow 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .agent-glyph {
+    position: absolute; top: 8px; right: 10px;
+    font-size: 34px; color: var(--line); line-height: 1;
+    font-family: 'Newsreader', serif;
+    user-select: none;
   }
   .agent-card.filled { box-shadow: inset 3px 0 0 var(--amber); }
   .agent-card.pulse { animation: pulse-in 0.6s ease; }
@@ -138,6 +330,8 @@
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
+    position: relative;
+    z-index: 1;
   }
   .status-tag {
     font-family: 'IBM Plex Mono', monospace;
@@ -154,6 +348,7 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
+    position: relative; z-index: 1;
   }
   .signal-badge {
     font-family: 'IBM Plex Mono', monospace;
@@ -172,13 +367,15 @@
     line-height: 1.55;
     color: var(--text);
     margin-bottom: 10px;
+    position: relative; z-index: 1;
   }
   .sources {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--text-dim);
+    position: relative; z-index: 1;
   }
-  .placeholder-text { color: var(--text-dim); font-size: 13px; }
+  .placeholder-text { color: var(--text-dim); font-size: 13px; position: relative; z-index: 1; }
 
   .spinner {
     width: 14px; height: 14px;
@@ -258,10 +455,10 @@
     margin: 0 0 14px;
     font-weight: 500;
   }
-  .kv { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .kv { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--line); gap: 12px; }
   .kv:last-child { border-bottom: none; }
   .kv .k { color: var(--text-dim); }
-  .kv .v { font-family: 'IBM Plex Mono', monospace; }
+  .kv .v { font-family: 'IBM Plex Mono', monospace; text-align: right; }
 
   .metrics-strip {
     font-family: 'IBM Plex Mono', monospace;
@@ -270,9 +467,123 @@
     text-align: center;
     padding-top: 20px;
   }
+
+  .data-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border: 1px solid var(--line);
+    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .data-badge.live { color: var(--bullish); border-color: var(--bullish); }
+  .data-badge.sample { color: var(--text-dim); }
+  .data-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .data-badge.live .dot { animation: blink 1.4s ease-in-out infinite; }
+
+  .kv .v.up { color: var(--bullish); }
+  .kv .v.down { color: var(--bearish); }
+
+  .headlines {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .headlines .h-item {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    padding: 3px 0;
+  }
+  .headlines .h-item::before { content: "›  "; color: var(--amber-dim); }
 </style>
 </head>
 <body>
+
+<div class="tape">
+  <div class="tape-track" id="tape-track">
+    <span class="tape-item"><span class="t-name">LOADING QUOTES…</span></span>
+  </div>
+</div>
+
+<!-- ═══════════════ INTAKE GATE ═══════════════ -->
+<div class="intake-shell" id="intake-shell">
+  <div class="intake-card bracket">
+    <div class="intake-eyebrow">DESK · PS-01 · HACKVERSE 2026</div>
+    <h1 class="intake-title">Who are we advising today?</h1>
+    <p class="intake-desc">
+      Six quick fields. The synthesis agent uses this to weigh every
+      recommendation against your actual risk appetite and goals —
+      not a generic average investor.
+    </p>
+
+    <div class="field">
+      <div class="field-label"><span>NAME <span class="num">(optional)</span></span></div>
+      <input type="text" class="text-input" id="f-name" placeholder="e.g. Aditi">
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>01 — RISK TOLERANCE</span></div>
+      <div class="pill-row" id="f-risk">
+        <div class="pill" data-value="low">LOW<small>Steady, low-volatility</small></div>
+        <div class="pill active" data-value="medium">MEDIUM<small>Some swings, OK</small></div>
+        <div class="pill" data-value="high">HIGH<small>Comfortable with drawdowns</small></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>02 — INVESTMENT HORIZON</span></div>
+      <div class="pill-row" id="f-horizon">
+        <div class="pill" data-value="short-term (weeks to months)">SHORT<small>Weeks–months</small></div>
+        <div class="pill active" data-value="medium-term (1-3 years)">MEDIUM<small>1–3 years</small></div>
+        <div class="pill" data-value="long-term (5+ years)">LONG<small>5+ years</small></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>03 — PRIMARY GOAL</span></div>
+      <select class="text-input" id="f-goal">
+        <option value="Capital preservation with steady, low-risk growth">Capital preservation</option>
+        <option value="Steady long-term wealth growth" selected>Steady long-term growth</option>
+        <option value="Maximize short-term trading gains">Short-term trading gains</option>
+        <option value="Building a first investment portfolio from scratch">Building my first portfolio</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>04 — MONTHLY INVESTMENT CAPACITY</span></div>
+      <input type="number" class="text-input money" id="f-capacity" value="30000" min="0" step="1000">
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <span>05 — MAX DRAWDOWN COMFORT</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="f-drawdown" min="5" max="50" value="20">
+        <span class="slider-readout" id="f-drawdown-readout">20%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>06 — CURRENT HOLDINGS <span class="num">(optional)</span></span></div>
+      <div class="chip-row" id="f-holdings"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>NOTES <span class="num">(optional)</span></span></div>
+      <textarea class="text-input" id="f-notes" placeholder="Anything else the agents should weigh — e.g. sectors you want to avoid, past experience, upcoming cash needs…"></textarea>
+    </div>
+
+    <button class="enter-btn" id="enter-btn">ENTER DESK →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<div class="dashboard" id="dashboard">
 <div class="wrap">
 
   <header>
@@ -280,16 +591,19 @@
       <div class="brand">DESK <span>/</span></div>
       <div class="sub">MULTI-AGENT FINANCIAL INTELLIGENCE · PS-01 · HACKVERSE 2026</div>
     </div>
-    <div class="sub" id="model-tag">MODEL: local</div>
+    <div class="header-right">
+      <div class="sub" id="model-tag">MODEL: gemini-3.6-flash</div>
+      <button class="edit-profile-link" id="edit-profile-btn">‹ EDIT PROFILE</button>
+    </div>
   </header>
 
-  <div class="console">
+  <div class="console bracket">
     <div class="console-row">
       <span class="prompt-glyph">&gt;</span>
       <span>ANALYZE</span>
       <select id="ticker-select"></select>
       <span>FOR</span>
-      <select id="profile-select"></select>
+      <span class="sub" id="active-profile-name" style="font-size:13px;color:var(--cyan)">—</span>
       <span class="cursor"></span>
       <button class="run-btn" id="run-btn">RUN</button>
     </div>
@@ -306,7 +620,7 @@
       <div id="market-panel"><div class="placeholder-text">Run an analysis to populate.</div></div>
     </div>
     <div class="panel">
-      <h3>USER PROFILE</h3>
+      <h3>YOUR PROFILE</h3>
       <div id="profile-panel"><div class="placeholder-text">Run an analysis to populate.</div></div>
     </div>
   </div>
@@ -314,28 +628,115 @@
   <div class="metrics-strip" id="metrics-strip"></div>
 
 </div>
+</div>
 
 <script>
 const API = "";
+const HOLDING_TICKERS = ["TCS", "ZOMATO", "HDFCBANK"];
 const AGENT_LABELS = {
   momentum_agent: "MOMENTUM",
   sentiment_agent: "SENTIMENT",
   filings_agent: "FILINGS (RAG)"
 };
+const AGENT_GLYPHS = { momentum_agent: "▲", sentiment_agent: "◈", filings_agent: "▣" };
 const AGENT_ORDER = ["momentum_agent", "sentiment_agent", "filings_agent"];
 
+let intakeShell = document.getElementById("intake-shell");
+let dashboard = document.getElementById("dashboard");
 let tickerSelect = document.getElementById("ticker-select");
-let profileSelect = document.getElementById("profile-select");
 let runBtn = document.getElementById("run-btn");
 let agentGrid = document.getElementById("agent-grid");
 let synthPanel = document.getElementById("synthesis-panel");
 let marketPanel = document.getElementById("market-panel");
 let profilePanel = document.getElementById("profile-panel");
 let metricsStrip = document.getElementById("metrics-strip");
+let activeProfileName = document.getElementById("active-profile-name");
+
+let currentProfile = null;
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+/* ── Intake form wiring ─────────────────────────────────────── */
+function wirePillGroup(id) {
+  const group = document.getElementById(id);
+  group.addEventListener("click", (e) => {
+    const pill = e.target.closest(".pill");
+    if (!pill) return;
+    [...group.children].forEach(c => c.classList.remove("active"));
+    pill.classList.add("active");
+  });
+}
+function pillValue(id) {
+  return document.getElementById(id).querySelector(".pill.active")?.dataset.value;
+}
+
+function renderHoldingsChips() {
+  const el = document.getElementById("f-holdings");
+  el.innerHTML = HOLDING_TICKERS.map(t => `<div class="chip" data-value="${t}">${t}</div>`).join("");
+  el.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    chip.classList.toggle("active");
+  });
+}
+
+const drawdownSlider = document.getElementById("f-drawdown");
+const drawdownReadout = document.getElementById("f-drawdown-readout");
+drawdownSlider.addEventListener("input", () => {
+  drawdownReadout.textContent = `${drawdownSlider.value}%`;
+});
+
+function buildProfileFromForm() {
+  const name = document.getElementById("f-name").value.trim() || "Investor";
+  const holdings = [...document.querySelectorAll("#f-holdings .chip.active")].map(c => c.dataset.value);
+  const notes = document.getElementById("f-notes").value.trim();
+  return {
+    name,
+    risk_tolerance: pillValue("f-risk"),
+    investment_horizon: pillValue("f-horizon"),
+    primary_goal: document.getElementById("f-goal").value,
+    monthly_investment_capacity_inr: Number(document.getElementById("f-capacity").value) || 0,
+    max_drawdown_tolerance_pct: Number(drawdownSlider.value),
+    current_holdings: holdings,
+    notes: notes || "None provided.",
+  };
+}
+
+function enterDashboard() {
+  currentProfile = buildProfileFromForm();
+  activeProfileName.textContent = currentProfile.name.toUpperCase();
+  intakeShell.classList.add("hidden");
+  dashboard.classList.add("visible");
+}
+
+function editProfile() {
+  dashboard.classList.remove("visible");
+  intakeShell.classList.remove("hidden");
+}
+
+/* ── Ticker tape (live quotes, no LLM cost) ─────────────────── */
+async function refreshTape() {
+  try {
+    const quotes = await fetch(`${API}/quotes`).then(r => r.json());
+    const track = document.getElementById("tape-track");
+    const items = Object.entries(quotes).flatMap(([ticker, q]) => {
+      const dir = q.change_pct > 0 ? "t-up" : q.change_pct < 0 ? "t-down" : "";
+      const arrow = q.change_pct > 0 ? "▲" : q.change_pct < 0 ? "▼" : "·";
+      const html = `<span class="tape-item"><span class="t-name">${ticker}</span><span class="${dir}">₹${Number(q.price).toLocaleString("en-IN")} ${arrow} ${q.change_pct}%</span></span>`;
+      return [html, html]; // duplicate for seamless loop
+    });
+    track.innerHTML = items.join("");
+  } catch (e) { /* tape is decorative, fail silently */ }
+}
 
 function renderPendingGrid() {
   agentGrid.innerHTML = AGENT_ORDER.map(key => `
     <div class="agent-card" id="card-${key}">
+      <div class="agent-glyph">${AGENT_GLYPHS[key]}</div>
       <div class="agent-name">
         <span>${AGENT_LABELS[key]}</span>
         <span class="status-tag pending" id="status-${key}">PENDING</span>
@@ -346,15 +747,18 @@ function renderPendingGrid() {
 }
 
 async function init() {
+  wirePillGroup("f-risk");
+  wirePillGroup("f-horizon");
+  renderHoldingsChips();
+  document.getElementById("enter-btn").addEventListener("click", enterDashboard);
+  document.getElementById("edit-profile-btn").addEventListener("click", editProfile);
+
   const tickers = await fetch(`${API}/tickers`).then(r => r.json());
   tickerSelect.innerHTML = tickers.tickers.map(t => `<option value="${t}">${t}</option>`).join("");
 
-  const profiles = await fetch(`${API}/profiles`).then(r => r.json());
-  profileSelect.innerHTML = Object.entries(profiles).map(
-    ([id, p]) => `<option value="${id}">${p.name.toUpperCase()}</option>`
-  ).join("");
-
   renderPendingGrid();
+  refreshTape();
+  setInterval(refreshTape, 60000);
 }
 
 function fillAgentCard(result) {
@@ -363,16 +767,9 @@ function fillAgentCard(result) {
   const statusTag = document.getElementById(`status-${key}`);
   if (!card) return;
 
-  if (result.degraded) {
-    statusTag.textContent = "DEGRADED";
-    statusTag.className = "status-tag degraded";
-  } else {
-    statusTag.textContent = `${result.latency_ms}ms`;
-    statusTag.className = "status-tag done";
-  }
-
   card.classList.add("filled", "pulse");
   card.innerHTML = `
+    <div class="agent-glyph">${AGENT_GLYPHS[key]}</div>
     <div class="agent-name">
       <span>${AGENT_LABELS[key]}</span>
       <span class="status-tag ${result.degraded ? 'degraded' : 'done'}">${result.degraded ? 'DEGRADED' : result.latency_ms + 'ms'}</span>
@@ -381,18 +778,15 @@ function fillAgentCard(result) {
       <span class="signal-badge ${result.signal}">${result.signal}</span>
       <span class="confidence">${result.confidence}% confidence</span>
     </div>
-    <div class="reasoning">${result.reasoning || ""}</div>
-    <div class="sources">${(result.sources || []).join(", ")}</div>
+    <div class="reasoning">${escapeHtml(result.reasoning)}</div>
+    <div class="sources">${(result.sources || []).map(escapeHtml).join(", ")}</div>
   `;
 }
 
 function markAgentsRunning() {
   AGENT_ORDER.forEach(key => {
     const statusTag = document.getElementById(`status-${key}`);
-    const card = document.getElementById(`card-${key}`);
-    if (statusTag) {
-      statusTag.innerHTML = `<span class="spinner"></span>`;
-    }
+    if (statusTag) statusTag.innerHTML = `<span class="spinner"></span>`;
   });
 }
 
@@ -407,33 +801,65 @@ function renderSynthesis(s) {
         <div class="conf-bar"><div class="conf-fill" style="width:${s.confidence}%"></div></div>
       </div>
     </div>
-    <div class="synth-reasoning">${s.reasoning || ""}</div>
-    ${(s.flags && s.flags.length) ? `<div class="flags">${s.flags.map(f => `<span class="flag-chip">${f}</span>`).join("")}</div>` : ""}
+    <div class="synth-reasoning">${escapeHtml(s.reasoning)}</div>
+    ${(s.flags && s.flags.length) ? `<div class="flags">${s.flags.map(f => `<span class="flag-chip">${escapeHtml(f)}</span>`).join("")}</div>` : ""}
   `;
 }
 
+const MARKET_FIELD_ORDER = ["price", "change_pct", "volume", "avg_volume_30d", "momentum_5d", "rsi", "exchange"];
+const MARKET_FIELD_FMT = {
+  price: v => `₹${Number(v).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`,
+  change_pct: v => `${v > 0 ? "+" : ""}${v}%`,
+  volume: v => Number(v).toLocaleString("en-IN"),
+  avg_volume_30d: v => Number(v).toLocaleString("en-IN"),
+  momentum_5d: v => `${v > 0 ? "+" : ""}${v}%`,
+  rsi: v => v,
+  exchange: v => v,
+};
+
 function renderContext(market, profile, log) {
-  marketPanel.innerHTML = Object.entries(market).filter(([k]) => k !== "news_headlines").map(
-    ([k, v]) => `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`
-  ).join("");
+  const isLive = market.data_source === "live";
+  const badge = `
+    <div class="data-badge ${isLive ? "live" : "sample"}">
+      <span class="dot"></span>${isLive ? "LIVE · NSE" : "SAMPLE DATA"}
+    </div>`;
+  const rows = MARKET_FIELD_ORDER.filter(k => k in market).map(k => {
+    const raw = market[k];
+    const fmt = (MARKET_FIELD_FMT[k] || (v => v))(raw);
+    const dirClass = (k === "change_pct" || k === "momentum_5d")
+      ? (raw > 0 ? "up" : raw < 0 ? "down" : "")
+      : "";
+    return `<div class="kv"><span class="k">${k}</span><span class="v ${dirClass}">${escapeHtml(fmt)}</span></div>`;
+  }).join("");
+  const headlines = (market.news_headlines || []).length ? `
+    <div class="headlines">
+      ${market.news_headlines.map(h => `<div class="h-item">${escapeHtml(h)}</div>`).join("")}
+    </div>` : "";
+  marketPanel.innerHTML = badge + rows + headlines;
+
   profilePanel.innerHTML = `
-    <div class="kv"><span class="k">risk_tolerance</span><span class="v">${profile.risk_tolerance}</span></div>
-    <div class="kv"><span class="k">horizon</span><span class="v">${profile.investment_horizon}</span></div>
-    <div class="kv"><span class="k">holdings</span><span class="v">${(profile.current_holdings||[]).join(", ")}</span></div>
+    <div class="kv"><span class="k">risk_tolerance</span><span class="v">${escapeHtml(profile.risk_tolerance)}</span></div>
+    <div class="kv"><span class="k">horizon</span><span class="v">${escapeHtml(profile.investment_horizon)}</span></div>
+    ${profile.primary_goal ? `<div class="kv"><span class="k">goal</span><span class="v">${escapeHtml(profile.primary_goal)}</span></div>` : ""}
+    ${profile.monthly_investment_capacity_inr ? `<div class="kv"><span class="k">monthly capacity</span><span class="v">₹${Number(profile.monthly_investment_capacity_inr).toLocaleString("en-IN")}</span></div>` : ""}
+    ${profile.max_drawdown_tolerance_pct != null ? `<div class="kv"><span class="k">max drawdown tolerance</span><span class="v">${profile.max_drawdown_tolerance_pct}%</span></div>` : ""}
+    <div class="kv"><span class="k">holdings</span><span class="v">${escapeHtml((profile.current_holdings||[]).join(", ") || "none")}</span></div>
+    ${profile.notes && profile.notes !== "None provided." ? `<div class="kv"><span class="k">notes</span><span class="v">${escapeHtml(profile.notes)}</span></div>` : ""}
   `;
   metricsStrip.textContent =
     `TOTAL LATENCY ${log.total_latency_ms}ms  ·  CONCENTRATION SCORE ${log.portfolio_concentration_score}  ·  DEGRADED AGENTS: ${(log.degraded_agents||[]).join(", ") || "none"}`;
 }
 
 function runAnalysis() {
+  if (!currentProfile) return;
   const ticker = tickerSelect.value;
-  const profileId = profileSelect.value;
   runBtn.disabled = true;
   runBtn.textContent = "RUNNING…";
   synthPanel.classList.remove("visible");
   renderPendingGrid();
 
-  const es = new EventSource(`${API}/analyze_stream/${ticker}?profile_id=${profileId}`);
+  const profileParam = encodeURIComponent(JSON.stringify(currentProfile));
+  const es = new EventSource(`${API}/analyze_stream/${ticker}?profile_json=${profileParam}`);
 
   es.onmessage = (e) => {
     const event = JSON.parse(e.data);
@@ -443,7 +869,7 @@ function runAnalysis() {
       fillAgentCard(event.result);
     } else if (event.type === "synthesizing") {
       synthPanel.classList.add("visible");
-      synthPanel.innerHTML = `<div class="placeholder-text"><span class="spinner"></span>&nbsp; Synthesizing across agents + user profile…</div>`;
+      synthPanel.innerHTML = `<div class="placeholder-text"><span class="spinner"></span>&nbsp; Synthesizing across agents + your profile…</div>`;
     } else if (event.type === "synthesis") {
       renderSynthesis(event.result);
     } else if (event.type === "log") {
@@ -452,7 +878,8 @@ function runAnalysis() {
         portfolio_concentration_score: event.log_entry.portfolio_concentration_score,
         degraded_agents: event.log_entry.degraded_agents,
       });
-    } else if (event.type === "done") {
+      // "log" is the true last event the server sends (emitted after "done"
+      // in analyze_stream) -- closing on "done" instead races this event.
       es.close();
       runBtn.disabled = false;
       runBtn.textContent = "RUN";

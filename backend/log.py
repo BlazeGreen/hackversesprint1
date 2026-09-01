@@ -31,7 +31,8 @@ def log_session(ticker: str, user_profile: dict, pipeline_result: dict, total_la
         ),
         "final_recommendation": pipeline_result["synthesis"].get("recommendation"),
         "degraded_agents": [
-            a["agent"] for a in pipeline_result["specialists"] if a.get("degraded")
+            a["agent"] for a in pipeline_result["specialists"] + [pipeline_result["synthesis"]]
+            if a.get("degraded")
         ],
     }
     with open(LOG_PATH, "a") as f:

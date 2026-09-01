@@ -1,0 +1,41 @@
+{
+  "TCS": {
+    "price": 4125.50,
+    "change_pct": 2.3,
+    "volume": 1850000,
+    "avg_volume_30d": 1200000,
+    "momentum_5d": 3.1,
+    "rsi": 68,
+    "news_headlines": [
+      "TCS wins large multi-year cloud migration deal with European bank",
+      "IT sector sees renewed FII buying ahead of Q2 earnings",
+      "Analysts split on TCS valuation after recent rally"
+    ]
+  },
+  "ZOMATO": {
+    "price": 268.10,
+    "change_pct": -4.8,
+    "volume": 42000000,
+    "avg_volume_30d": 18000000,
+    "momentum_5d": -6.5,
+    "rsi": 29,
+    "news_headlines": [
+      "Zomato faces increased competition from quick-commerce rivals",
+      "Brokerages cut price targets citing margin pressure",
+      "Founder sells minor stake, triggers retail panic selling"
+    ]
+  },
+  "HDFCBANK": {
+    "price": 1642.75,
+    "change_pct": 0.4,
+    "volume": 9800000,
+    "avg_volume_30d": 9500000,
+    "momentum_5d": 0.8,
+    "rsi": 52,
+    "news_headlines": [
+      "HDFC Bank reports steady deposit growth in Q2",
+      "RBI maintains repo rate, banking stocks largely flat",
+      "Analysts see HDFC Bank as a defensive pick amid volatility"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "conservative_investor": {
+    "name": "Conservative Investor",
+    "risk_tolerance": "low",
+    "investment_horizon": "long-term (5+ years)",
+    "current_holdings": ["HDFCBANK", "TCS"],
+    "notes": "Prioritizes capital preservation. Avoids high-volatility momentum plays. Prefers dividend-paying large caps."
+  },
+  "aggressive_investor": {
+    "name": "Aggressive Investor",
+    "risk_tolerance": "high",
+    "investment_horizon": "short-term (weeks to months)",
+    "current_holdings": ["ZOMATO"],
+    "notes": "Comfortable with high volatility for higher returns. Actively trades momentum and mid/small-cap swings. History of holding through 15%+ drawdowns."
+  }
+}

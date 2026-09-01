@@ -1,4 +1,4 @@
-# DESK — Architecture & Decision Logic Summary
+# VANTAGE — Architecture & Decision Logic Summary
 
 **PS-01 — Multi-Agent Autonomous Financial Intelligence System for Retail Investors**
 HACKVERSE: Into the Web, Sprint 1 · IEEE RAS VIT Chennai Student Chapter

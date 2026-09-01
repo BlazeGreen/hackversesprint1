@@ -1,4 +1,4 @@
-# DESK — Multi-Agent Financial Intelligence
+# VANTAGE — Multi-Agent Financial Intelligence
 
 **HACKVERSE: Into the Web, Sprint 1 · PS-01** — IEEE Robotics & Automation Society, VIT Chennai Student Chapter
 

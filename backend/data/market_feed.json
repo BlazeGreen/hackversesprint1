@@ -37,5 +37,44 @@
       "RBI maintains repo rate, banking stocks largely flat",
       "Analysts see HDFC Bank as a defensive pick amid volatility"
     ]
+  },
+  "RELIANCE": {
+    "price": 1305.00,
+    "change_pct": 1.1,
+    "volume": 8500000,
+    "avg_volume_30d": 7200000,
+    "momentum_5d": 2.4,
+    "rsi": 58,
+    "news_headlines": [
+      "Reliance Jio crosses new 5G subscriber milestone",
+      "Retail arm posts strong festive-season same-store growth",
+      "Refining margins soften on lower crack spreads"
+    ]
+  },
+  "INFY": {
+    "price": 1450.00,
+    "change_pct": -0.8,
+    "volume": 6100000,
+    "avg_volume_30d": 5800000,
+    "momentum_5d": -1.2,
+    "rsi": 46,
+    "news_headlines": [
+      "Infosys lands multi-year deal with European insurer",
+      "Management flags cautious client spending in discretionary IT budgets",
+      "Attrition ticks down for third straight quarter"
+    ]
+  },
+  "ICICIBANK": {
+    "price": 1420.00,
+    "change_pct": 0.5,
+    "volume": 7300000,
+    "avg_volume_30d": 6900000,
+    "momentum_5d": 1.0,
+    "rsi": 55,
+    "news_headlines": [
+      "ICICI Bank reports strong retail loan book growth",
+      "Digital banking push drives lower cost-to-income ratio",
+      "Asset quality remains stable, provisioning coverage unchanged"
+    ]
   }
 }

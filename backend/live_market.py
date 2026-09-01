@@ -7,7 +7,14 @@ so a flaky connection degrades gracefully instead of breaking the demo.
 import time
 import httpx
 
-YAHOO_SYMBOLS = {"TCS": "TCS.NS", "ZOMATO": "ETERNAL.NS", "HDFCBANK": "HDFCBANK.NS"}
+YAHOO_SYMBOLS = {
+    "TCS": "TCS.NS",
+    "ZOMATO": "ETERNAL.NS",
+    "HDFCBANK": "HDFCBANK.NS",
+    "RELIANCE": "RELIANCE.NS",
+    "INFY": "INFY.NS",
+    "ICICIBANK": "ICICIBANK.NS",
+}
 CACHE_TTL_SECONDS = 120
 
 _client = httpx.Client(timeout=8, headers={"User-Agent": "Mozilla/5.0"})
